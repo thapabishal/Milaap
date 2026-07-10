@@ -20,6 +20,8 @@ interface AnimalCardProps {
   maxDaysWaiting: number
   /** Show "↑ Next animal" hint below CTA — only on the first card */
   showScrollHint?: boolean
+  /** Mobile scroll-snap mode: photo takes 55svh, card fills the snap slot */
+  snapMode?: boolean
 }
 
 // ── Helpers ────────────────────────────────────────────────
@@ -83,6 +85,7 @@ export default function AnimalCard({
   animal,
   maxDaysWaiting,
   showScrollHint = false,
+  snapMode = false,
 }: AnimalCardProps) {
   const { t, i18n } = useTranslation()
   const [shareOpen, setShareOpen] = useState(false)
@@ -124,11 +127,24 @@ export default function AnimalCard({
   return (
     <>
       <article
-        className="bg-white rounded-[20px] overflow-hidden shadow-[0_1px_3px_rgba(45,41,38,0.06)] hover:shadow-[0_4px_16px_rgba(45,41,38,0.08)] transition-shadow"
+        className={[
+          'bg-white overflow-hidden shadow-[0_1px_3px_rgba(45,41,38,0.06)]',
+          snapMode
+            ? 'rounded-[20px] flex flex-col h-full hover:shadow-[0_4px_16px_rgba(45,41,38,0.08)] transition-shadow'
+            : 'rounded-[20px] hover:shadow-[0_4px_16px_rgba(45,41,38,0.08)] transition-shadow',
+        ].join(' ')}
         aria-label={`${animal.name}, ${capitalise(animal.species)}, waiting ${animal.days_waiting} days`}
       >
         {/* ── Photo area ──────────────────────────────── */}
-        <Link href={profileHref} className="block relative h-[240px] bg-linen-dark" tabIndex={-1} aria-hidden="true">
+        <Link
+          href={profileHref}
+          className={[
+            'block relative bg-linen-dark shrink-0',
+            snapMode ? 'h-[55svh]' : 'h-[240px]',
+          ].join(' ')}
+          tabIndex={-1}
+          aria-hidden="true"
+        >
 
           {heroPhoto ? (
             <Image
@@ -175,7 +191,7 @@ export default function AnimalCard({
         </div>
 
         {/* ── Content ─────────────────────────────────── */}
-        <div className="px-4 pb-4 flex flex-col gap-2">
+        <div className={['px-4 pb-4 flex flex-col gap-2', snapMode ? 'overflow-y-auto flex-1' : ''].join(' ')}>
 
           {/* Name */}
           <Link href={profileHref} className="group">

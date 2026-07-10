@@ -1,7 +1,8 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import { getDiscoveryFeed } from '@/lib/animals'
-import DiscoveryFeed from '@/components/animal/DiscoveryFeed'
+import { getDiscoveryFeed, getAvailableCities } from '@/lib/animals'
+import type { AnimalSpecies, AnimalSize } from '@/lib/animals'
+import DiscoverShell from '@/components/animal/DiscoverShell'
 import AnimalCardSkeleton from '@/components/animal/AnimalCardSkeleton'
 
 export const metadata: Metadata = {
@@ -17,10 +18,19 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://milaap.dpdns.org/discover' },
 }
 
-// ── Skeleton grid shown by Suspense while server fetches ──
+interface SearchParams {
+  species?: string
+  size?: string
+  city?: string
+  kids?: string
+  cats?: string
+  apt?: string
+}
+
+// ── Loading fallback ───────────────────────────────────────
 function LoadingGrid() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
       {Array.from({ length: 6 }).map((_, i) => (
         <AnimalCardSkeleton key={i} />
       ))}
@@ -28,39 +38,51 @@ function LoadingGrid() {
   )
 }
 
-// ── Server-fetched feed ────────────────────────────────────
-async function Feed() {
-  const { animals, maxDaysWaiting } = await getDiscoveryFeed({ limit: 12 })
+// ── Server data fetch + render ─────────────────────────────
+async function FeedWithData({ sp }: { sp: SearchParams }) {
+  const [{ animals, maxDaysWaiting, totalCount }, cities] = await Promise.all([
+    getDiscoveryFeed({
+      species:      sp.species as AnimalSpecies | undefined,
+      size:         sp.size    as AnimalSize    | undefined,
+      city:         sp.city,
+      goodWithKids: sp.kids === 'true' || undefined,
+      goodWithCats: sp.cats === 'true' || undefined,
+      apartmentOk:  sp.apt  === 'true' || undefined,
+      page:         1,
+      limit:        12,
+    }),
+    getAvailableCities(),
+  ])
 
   return (
-    <DiscoveryFeed
-      animals={animals}
-      maxDaysWaiting={maxDaysWaiting}
+    <DiscoverShell
+      initialAnimals={animals}
+      initialMaxDays={maxDaysWaiting}
+      initialTotal={totalCount}
+      cities={cities}
+      searchParams={sp}
     />
   )
 }
 
 // ── Page ───────────────────────────────────────────────────
-export default function DiscoverPage() {
+export default async function DiscoverPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>
+}) {
+  const sp = await searchParams
+
   return (
     <div className="min-h-screen bg-linen">
-      <div className="px-5 md:px-7 max-w-[680px] mx-auto pt-8 pb-16">
-
-        {/* Page heading */}
-        <div className="mb-6">
-          <h1 className="font-satoshi font-bold text-[28px] tracking-[-0.02em] text-charcoal leading-tight">
-            Find a companion
-          </h1>
-          <p className="mt-1 text-sm text-stone font-light">
-            Sorted by longest waiting — every day matters.
-          </p>
+      <Suspense fallback={
+        <div className="px-5 md:px-7 max-w-[680px] mx-auto pt-8">
+          <div className="mb-6 h-16 animate-shimmer rounded-lg" />
+          <LoadingGrid />
         </div>
-
-        {/* Feed — Suspense shows skeletons during server fetch */}
-        <Suspense fallback={<LoadingGrid />}>
-          <Feed />
-        </Suspense>
-      </div>
+      }>
+        <FeedWithData sp={sp} />
+      </Suspense>
     </div>
   )
 }
