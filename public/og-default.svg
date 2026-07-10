@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
+  <rect width="1200" height="630" fill="#F7F2EB"/>
+  <rect x="0" y="540" width="1200" height="90" fill="#2D2926"/>
+  <text x="100" y="260" font-family="sans-serif" font-size="72" font-weight="bold" fill="#2D2926">Milaap Nepal</text>
+  <text x="100" y="340" font-family="sans-serif" font-size="28" fill="#8A8078">Two stories. One journey.</text>
+  <text x="100" y="400" font-family="sans-serif" font-size="22" fill="#C46F52">Connecting rescued animals with loving families.</text>
+  <circle cx="1100" cy="200" r="80" fill="#C46F52" opacity="0.12"/>
+  <circle cx="1100" cy="200" r="40" fill="#C46F52" opacity="0.2"/>
+  <circle cx="1100" cy="200" r="10" fill="#C46F52"/>
+</svg>
