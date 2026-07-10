@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "discover": "Discover",
+    "happyTails": "Happy Tails",
+    "about": "About"
+  },
+  "welcome": {
+    "headline": "Someone is waiting for",
+    "headline_you": "you.",
+    "subtext": "Rescued animals across Nepal. Each with a story. Each waiting for someone to read it.",
+    "cta": "Meet them"
+  },
+  "animal": {
+    "daysWaiting": "{{count}} days waiting",
+    "available": "Available",
+    "reserved": "Reserved",
+    "fostered": "In foster care",
+    "medicalHold": "Not currently available",
+    "adopted": "Found their home",
+    "goodWithKids": "Good with kids",
+    "goodWithDogs": "Good with dogs",
+    "goodWithCats": "Good with cats",
+    "apartmentOk": "Apartment ok",
+    "vaccinated": "Vaccinated",
+    "neutered": "Neutered",
+    "meetCta": "Meet {{name}}",
+    "whatsappCta": "Message {{org}} about {{name}}"
+  },
+  "footer": {
+    "builtBy": "Built and maintained by All Care Nepal · Butwal, Nepal",
+    "website": "allcarenepal.org"
+  }
+}

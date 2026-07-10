@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "discover": "खोज्नुहोस्",
+    "happyTails": "सफल कथाहरू",
+    "about": "बारेमा"
+  },
+  "welcome": {
+    "headline": "कोही प्रतीक्षामा छ",
+    "headline_you": "तपाईंको।",
+    "subtext": "नेपालभर उद्धार गरिएका जनावरहरू। प्रत्येकसँग एउटा कथा छ। प्रत्येक कसैको प्रतीक्षामा छ।",
+    "cta": "तिनीहरूलाई भेट्नुहोस्"
+  },
+  "animal": {
+    "daysWaiting": "{{count}} दिनदेखि पर्खिरहेको",
+    "available": "उपलब्ध",
+    "reserved": "आरक्षित",
+    "fostered": "पालनपोषणमा",
+    "medicalHold": "अहिले उपलब्ध छैन",
+    "adopted": "घर भेट्यो",
+    "goodWithKids": "बच्चाहरूसँग मिल्छ",
+    "goodWithDogs": "कुकुरसँग मिल्छ",
+    "goodWithCats": "बिरालोसँग मिल्छ",
+    "apartmentOk": "अपार्टमेन्टमा ठिक",
+    "vaccinated": "खोप लगाइएको",
+    "neutered": "बन्ध्याकरण गरिएको",
+    "meetCta": "{{name}} लाई भेट्नुहोस्",
+    "whatsappCta": "{{name}} बारे {{org}} लाई सन्देश"
+  },
+  "footer": {
+    "builtBy": "अल केयर नेपाल द्वारा निर्मित र संचालित · बुटवल, नेपाल",
+    "website": "allcarenepal.org"
+  }
+}

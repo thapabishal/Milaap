@@ -1,26 +1,66 @@
 @import "tailwindcss";
 
+@theme {
+  /* ── Fonts ──────────────────────────────────────── */
+  --font-satoshi: var(--font-satoshi), sans-serif;
+
+  /* ── Brand colors ───────────────────────────────── */
+  --color-linen:        #F7F2EB;
+  --color-terracotta:   #C46F52;
+  --color-dusty-rose:   #D7A79A;
+  --color-sage:         #8A9B82;
+  --color-charcoal:     #2D2926;
+  --color-white:        #FFFFFF;
+  --color-stone:        #8A8078;
+  --color-linen-dark:   #E8DDD0;
+
+  /* ── Status colors ──────────────────────────────── */
+  --color-status-available: #8A9B82;
+  --color-status-reserved:  #D7A79A;
+  --color-status-fostered:  #C4A882;
+  --color-status-medical:   #A08A7A;
+  --color-status-adopted:   #6A8A6A;
+
+  /* ── Spacing (8px base grid) ────────────────────── */
+  --spacing-xs:  4px;
+  --spacing-sm:  8px;
+  --spacing-md:  16px;
+  --spacing-lg:  24px;
+  --spacing-xl:  32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+
+  /* ── Border radius ──────────────────────────────── */
+  --radius-tag:    6px;
+  --radius-card:   12px;
+  --radius-card-lg: 20px;
+  --radius-pill:   9999px;
+}
+
+/* ── Shimmer animation ───────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    #E8DDD0 25%,
+    #F2EDE6 50%,
+    #E8DDD0 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ── Base styles ─────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-satoshi: '';
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-satoshi), sans-serif;
+  background-color: #F7F2EB;
+  color: #2D2926;
 }
