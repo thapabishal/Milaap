@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { trackEvent } from '@/lib/analytics'
 import { useToast } from '@/components/ui/useToast'
@@ -29,6 +29,10 @@ export default function ShareSheet({
   const { t, i18n } = useTranslation()
   const { toast, ToastPortal } = useToast()
   const url = `https://milaap.dpdns.org/p/${animalSlug}`
+
+  // Defer rendering until client-side — prevents SSR/client i18n key mismatch
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
 
   // Close on Escape, lock body scroll
   useEffect(() => {
@@ -66,6 +70,9 @@ export default function ShareSheet({
   }
 
   const isNepali = i18n.language?.startsWith('ne')
+
+  // Don't render translated content until mounted — avoids SSR/i18n hydration mismatch
+  if (!mounted) return null
 
   return (
     <>
