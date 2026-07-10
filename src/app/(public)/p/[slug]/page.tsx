@@ -4,6 +4,10 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import AnimalPhotoGallery from '@/components/animal/AnimalPhotoGallery'
+import AnimalStory from '@/components/animal/AnimalStory'
+import AnimalTraits from '@/components/animal/AnimalTraits'
+import AnimalPerks from '@/components/animal/AnimalPerks'
+import AnimalPhotoGrid from '@/components/animal/AnimalPhotoGrid'
 import ProfileViewTracker from '@/components/animal/ProfileViewTracker'
 import Badge from '@/components/ui/Badge'
 import WaitingBar from '@/components/ui/WaitingBar'
@@ -26,6 +30,17 @@ interface AnimalProfile {
   age_months: number | null
   gender: AnimalGender
   one_liner: string
+  story_en: string
+  story_ne: string | null
+  personality_en: string | null
+  personality_ne: string | null
+  good_with_kids: boolean | null
+  good_with_dogs: boolean | null
+  good_with_cats: boolean | null
+  apartment_ok: boolean | null
+  is_vaccinated: boolean
+  is_neutered: boolean
+  energy_level: 'low' | 'medium' | 'high' | null
   status: AnimalStatus
   intake_date: string
   photos: Photo[]
@@ -85,7 +100,11 @@ async function getAnimalBySlug(slug: string): Promise<AnimalProfile | null> {
     .select(`
       id, name, slug, species, breed,
       age_years, age_months, gender,
-      one_liner, status, intake_date, photos,
+      one_liner, story_en, story_ne,
+      personality_en, personality_ne,
+      good_with_kids, good_with_dogs, good_with_cats,
+      apartment_ok, is_vaccinated, is_neutered, energy_level,
+      status, intake_date, photos,
       organization_id,
       organizations ( name, slug, city, whatsapp_number )
     `)
@@ -236,8 +255,38 @@ export default async function AnimalProfilePage({
             "{animal.one_liner}"
           </p>
 
-          {/* Spacer — bottom sections built tomorrow */}
-          <div className="h-20" />
+          {/* Story + personality */}
+          <AnimalStory
+            gender={animal.gender}
+            story_en={animal.story_en}
+            story_ne={animal.story_ne}
+            personality_en={animal.personality_en}
+            personality_ne={animal.personality_ne}
+          />
+
+          {/* Traits */}
+          <AnimalTraits
+            animalName={animal.name}
+            good_with_kids={animal.good_with_kids}
+            good_with_dogs={animal.good_with_dogs}
+            good_with_cats={animal.good_with_cats}
+            apartment_ok={animal.apartment_ok}
+            is_vaccinated={animal.is_vaccinated}
+            is_neutered={animal.is_neutered}
+            energy_level={animal.energy_level}
+          />
+
+          {/* Perks */}
+          <AnimalPerks animalName={animal.name} />
+
+          {/* Extra photo grid */}
+          <AnimalPhotoGrid
+            photos={animal.photos}
+            animalName={animal.name}
+          />
+
+          {/* Bottom padding */}
+          <div className="h-24" />
         </div>
       </article>
     </>
