@@ -48,7 +48,13 @@
     "shareSheet_copyLink": "Copy link",
     "shareSheet_copied": "Link copied!",
     "shareSheet_comingSoon": "Coming Day 21",
-    "shareWhatsappText": "{{name}} has been waiting {{days}} days. {{oneLiner}} {{url}}"
+    "shareWhatsappText": "{{name}} has been waiting {{days}} days. {{oneLiner}} {{url}}",
+    "adopted_foundFamily": "{{name}} found their family.",
+    "adopted_date": "Adopted {{monthYear}}",
+    "adopted_inspired": "This story inspired {{count}} people to inquire about adoption.",
+    "adopted_happyTailsCta": "Read {{name}}'s Happy Tails story →",
+    "adopted_storyComing": "Story coming soon — check back",
+    "daysNowHome": "{{count}} days — now home"
   },
   "footer": {
     "builtBy": "Built and maintained by All Care Nepal · Butwal, Nepal",

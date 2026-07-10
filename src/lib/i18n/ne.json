@@ -48,7 +48,13 @@
     "shareSheet_copyLink": "लिंक copy गर्नुहोस्",
     "shareSheet_copied": "लिंक copy भयो!",
     "shareSheet_comingSoon": "Day 21 मा आउँदैछ",
-    "shareWhatsappText": "{{name}} {{days}} दिनदेखि पर्खिरहेको छ। {{oneLiner}} {{url}}"
+    "shareWhatsappText": "{{name}} {{days}} दिनदेखि पर्खिरहेको छ। {{oneLiner}} {{url}}",
+    "adopted_foundFamily": "{{name}} ले आफ्नो परिवार पायो।",
+    "adopted_date": "{{monthYear}} मा adopt भयो",
+    "adopted_inspired": "यो कथाले {{count}} जनालाई adopt गर्न प्रेरित गर्यो।",
+    "adopted_happyTailsCta": "{{name}} को Happy Tails कथा पढ्नुहोस् →",
+    "adopted_storyComing": "कथा चाँडै आउँदैछ — पछि हेर्नुहोस्",
+    "daysNowHome": "{{count}} दिन — अब घरमा"
   },
   "footer": {
     "builtBy": "अल केयर नेपाल द्वारा निर्मित र संचालित · बुटवल, नेपाल",

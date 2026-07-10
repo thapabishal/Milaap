@@ -9,6 +9,8 @@ import AnimalTraits from '@/components/animal/AnimalTraits'
 import AnimalPerks from '@/components/animal/AnimalPerks'
 import AnimalPhotoGrid from '@/components/animal/AnimalPhotoGrid'
 import AnimalCTA from '@/components/animal/AnimalCTA'
+import AdoptedBanner from '@/components/animal/AdoptedBanner'
+import AdoptedWaitingBar from '@/components/animal/AdoptedWaitingBar'
 import ProfileViewTracker from '@/components/animal/ProfileViewTracker'
 import Badge from '@/components/ui/Badge'
 import WaitingBar from '@/components/ui/WaitingBar'
@@ -44,6 +46,9 @@ interface AnimalProfile {
   energy_level: 'low' | 'medium' | 'high' | null
   status: AnimalStatus
   intake_date: string
+  adopted_date: string | null
+  adopted_by_city: string | null
+  whatsapp_tap_count: number
   photos: Photo[]
   organization_id: string
   organizations: {
@@ -105,7 +110,8 @@ async function getAnimalBySlug(slug: string): Promise<AnimalProfile | null> {
       personality_en, personality_ne,
       good_with_kids, good_with_dogs, good_with_cats,
       apartment_ok, is_vaccinated, is_neutered, energy_level,
-      status, intake_date, photos,
+      status, intake_date, adopted_date, adopted_by_city,
+      whatsapp_tap_count, photos,
       organization_id,
       organizations ( name, slug, city, whatsapp_number )
     `)
@@ -118,6 +124,25 @@ async function getAnimalBySlug(slug: string): Promise<AnimalProfile | null> {
     return null
   }
   return data as AnimalProfile | null
+}
+
+function daysWaitedAdopted(intakeDate: string, adoptedDate: string | null): number {
+  const intake = new Date(intakeDate)
+  const end = adoptedDate ? new Date(adoptedDate) : new Date()
+  return Math.max(0, Math.floor((end.getTime() - intake.getTime()) / (1000 * 60 * 60 * 24)))
+}
+
+async function getHappyTailId(animalId: string): Promise<string | null> {
+  const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await (supabase as any)
+    .from('happy_tails')
+    .select('id')
+    .eq('animal_id', animalId)
+    .eq('status', 'approved')
+    .limit(1)
+    .maybeSingle()
+  return (data as { id: string } | null)?.id ?? null
 }
 
 async function getMaxDaysWaiting(): Promise<number> {
@@ -190,7 +215,14 @@ export default async function AnimalProfilePage({
 
   if (!animal) notFound()
 
-  const days = daysWaiting(animal.intake_date)
+  const isAdopted = animal.status === 'adopted'
+
+  // For adopted: fetch happy tail; for active: skip
+  const happyTailId = isAdopted ? await getHappyTailId(animal.id) : null
+
+  const days = isAdopted
+    ? daysWaitedAdopted(animal.intake_date, animal.adopted_date)
+    : daysWaiting(animal.intake_date)
   const org = animal.organizations
   const ageStr = formatAge(animal.age_years, animal.age_months)
   const badgeVariant = STATUS_TO_BADGE[animal.status]
@@ -232,9 +264,13 @@ export default async function AnimalProfilePage({
             ) : null}
           </div>
 
-          {/* Waiting bar */}
+          {/* Waiting bar — adopted shows different bar + label */}
           <div className="mt-4">
-            <WaitingBar daysWaiting={days} maxDaysWaiting={maxDays} />
+            {isAdopted ? (
+              <AdoptedWaitingBar daysWaited={days} />
+            ) : (
+              <WaitingBar daysWaiting={days} maxDaysWaiting={maxDays} />
+            )}
           </div>
 
           {/* Name */}
@@ -255,6 +291,19 @@ export default async function AnimalProfilePage({
           <p className="mt-4 text-sm text-stone font-light italic leading-relaxed">
             "{animal.one_liner}"
           </p>
+
+          {/* Adopted announcement banner — above story */}
+          {isAdopted && (
+            <div className="mt-6">
+              <AdoptedBanner
+                animalName={animal.name}
+                adoptedDate={animal.adopted_date}
+                adopterCity={animal.adopted_by_city}
+                whatsappTapCount={animal.whatsapp_tap_count}
+                happyTailId={happyTailId}
+              />
+            </div>
+          )}
 
           {/* Story + personality */}
           <AnimalStory
@@ -286,8 +335,8 @@ export default async function AnimalProfilePage({
             animalName={animal.name}
           />
 
-          {/* CTA section — WhatsApp + share */}
-          {org && (
+          {/* CTA section — hidden for adopted animals */}
+          {org && !isAdopted && (
             <AnimalCTA
               animalId={animal.id}
               animalName={animal.name}

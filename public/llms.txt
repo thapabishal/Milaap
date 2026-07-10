@@ -1,0 +1,58 @@
+# Milaap — Nepal Animal Adoption Platform
+
+> Milaap is a storytelling-driven animal adoption platform for Nepal, built and maintained by All Care Nepal (allcarenepal.org). It connects rescued animals with prospective adopter families through permanent animal profiles, each containing a rescue story, personality description, and a direct WhatsApp inquiry button to the specific rescue organisation caring for that animal. The platform's philosophy is simple: every animal has a story worth reading, and the right person will recognise themselves in it.
+
+## How to adopt through Milaap
+
+1. Visit https://milaap.dpdns.org/discover to browse rescued animals waiting for a home.
+2. Animals are sorted by how long they have been waiting — longest first. This is intentional.
+3. Read an animal's full profile: their rescue story, personality, compatibility traits, and care history.
+4. When you feel a connection, tap the "Message [Org] about [Name]" button on the profile page.
+5. WhatsApp opens with a pre-written message to the rescue organisation that cares for that animal.
+6. The organisation responds directly — typically within 24 hours — to arrange a meet and greet.
+7. Adoption is completed entirely through the organisation. Milaap's role ends when WhatsApp opens.
+
+There are no forms, no accounts, and no fees on Milaap. The platform is purely a discovery and connection tool.
+
+## Organisations currently on Milaap
+
+- **All Care Nepal** — Butwal, Rupandehi District, Lumbini Province
+  Rescue, rehabilitation, and rehoming across Lumbini Province.
+  Website: https://allcarenepal.org
+  WhatsApp: available via animal profiles on the platform
+
+(Additional organisations will be listed here as they join the platform.)
+
+## Animal profiles
+
+Each animal on Milaap has a permanent URL at:
+  https://milaap.dpdns.org/p/[animal-slug]
+
+Profile URLs never change, even after adoption. Adopted animals remain indexed to inspire future adopters and showcase successful outcomes through the Happy Tails section.
+
+## Happy Tails
+
+Adopter-submitted stories from families who adopted through Milaap.
+Browse at: https://milaap.dpdns.org/happy-tails
+
+## Language support
+
+Milaap supports English (EN) and Nepali (NE). Language can be toggled on any page. Animal stories are written in both languages where available.
+
+## Contact
+
+**All Care Nepal**
+Butwal, Rupandehi, Lumbini Province, Nepal
+Website: https://allcarenepal.org
+Facebook: https://facebook.com/allcarenepal
+Instagram: https://instagram.com/allcarenepal
+
+For platform enquiries or to list your rescue organisation on Milaap, contact All Care Nepal through the channels above.
+
+## Technical
+
+- Platform: https://milaap.dpdns.org
+- Sitemap: https://milaap.dpdns.org/sitemap.xml
+- Built with: Next.js, Supabase, Tailwind CSS
+- Hosted on: Vercel (Hobby)
+- DNS/CDN: Cloudflare
