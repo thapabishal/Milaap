@@ -8,6 +8,7 @@ import AnimalStory from '@/components/animal/AnimalStory'
 import AnimalTraits from '@/components/animal/AnimalTraits'
 import AnimalPerks from '@/components/animal/AnimalPerks'
 import AnimalPhotoGrid from '@/components/animal/AnimalPhotoGrid'
+import AnimalCTA from '@/components/animal/AnimalCTA'
 import ProfileViewTracker from '@/components/animal/ProfileViewTracker'
 import Badge from '@/components/ui/Badge'
 import WaitingBar from '@/components/ui/WaitingBar'
@@ -285,10 +286,76 @@ export default async function AnimalProfilePage({
             animalName={animal.name}
           />
 
-          {/* Bottom padding */}
-          <div className="h-24" />
+          {/* CTA section — WhatsApp + share */}
+          {org && (
+            <AnimalCTA
+              animalId={animal.id}
+              animalName={animal.name}
+              animalSlug={animal.slug}
+              animalOneLiner={animal.one_liner}
+              daysWaiting={days}
+              orgName={org.name}
+              orgWhatsapp={org.whatsapp_number}
+              organizationId={animal.organization_id}
+            />
+          )}
+
+          {/* Bottom padding — extra on mobile for sticky bar */}
+          <div className="h-28 md:h-16" />
         </div>
       </article>
+
+      {/* ── JSON-LD structured data ──────────────────────── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            // Animal schema
+            {
+              '@context': 'https://schema.org',
+              '@type': 'Animal',
+              name: animal.name,
+              description: animal.one_liner,
+              url: `https://milaap.dpdns.org/p/${animal.slug}`,
+              image: animal.photos.find((p) => p.is_hero)?.path
+                ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/animal-photos/${animal.photos.find((p) => p.is_hero)!.path}`
+                : undefined,
+              provider: org
+                ? {
+                    '@type': 'Organization',
+                    name: org.name,
+                    url: `https://milaap.dpdns.org/org/${org.slug}`,
+                  }
+                : undefined,
+            },
+            // BreadcrumbList schema
+            {
+              '@context': 'https://schema.org',
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                {
+                  '@type': 'ListItem',
+                  position: 1,
+                  name: 'Home',
+                  item: 'https://milaap.dpdns.org',
+                },
+                {
+                  '@type': 'ListItem',
+                  position: 2,
+                  name: 'Discover',
+                  item: 'https://milaap.dpdns.org/discover',
+                },
+                {
+                  '@type': 'ListItem',
+                  position: 3,
+                  name: animal.name,
+                  item: `https://milaap.dpdns.org/p/${animal.slug}`,
+                },
+              ],
+            },
+          ]),
+        }}
+      />
     </>
   )
 }
