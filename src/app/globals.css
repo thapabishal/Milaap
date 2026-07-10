@@ -60,6 +60,14 @@
   /* final width is set inline via style.width */
 }
 
+/* ── Scroll hint line animation ──────────────────── */
+@keyframes scrollLineGrow {
+  0%   { height: 0px;  opacity: 0; }
+  30%  { height: 24px; opacity: 1; }
+  70%  { height: 24px; opacity: 1; }
+  100% { height: 0px;  opacity: 0; }
+}
+
 /* ── Base styles ─────────────────────────────────── */
 :root {
   --font-satoshi: '';

@@ -30,6 +30,13 @@ export default function RootLayout({
     // lang="en" is the server default; LangSync updates it on the client
     // when the user switches language or a saved preference is detected.
     <html lang="en" className={`${satoshi.variable} h-full antialiased scroll-smooth`}>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#C46F52" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+      </head>
       <body className="min-h-full flex flex-col bg-linen text-charcoal">
         <I18nProvider>
           <LangSync />

@@ -1,10 +1,13 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import HeroHeadline from '@/components/layout/HeroHeadline'
 import WaitingBar from '@/components/ui/WaitingBar'
 import Button from '@/components/ui/Button'
+import ScrollHint from '@/components/layout/ScrollHint'
+
+// Force dynamic — Math.random() for featured animal rotation must not be cached
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Milaap — Where rescued animals meet their families | Nepal',
@@ -13,14 +16,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Milaap Nepal — Two stories. One journey.',
     description: 'Where rescued animals meet their families.',
-    images: [{ url: '/og-default.svg', width: 1200, height: 630 }],
+    images: [{ url: '/api/share-image/default', width: 1200, height: 630 }],
     siteName: 'Milaap Nepal',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Milaap Nepal — Two stories. One journey.',
     description: 'Where rescued animals meet their families.',
-    images: ['/og-default.svg'],
+    images: ['/api/share-image/default'],
   },
   alternates: {
     canonical: 'https://milaap.dpdns.org',
@@ -50,16 +53,18 @@ async function getFeaturedAnimal(): Promise<FeaturedAnimal | null> {
     .select('id, name, slug, intake_date, photos, organizations(name)')
     .eq('is_featured', true)
     .eq('is_published', true)
-    .eq('status', 'available')
-    .limit(1)
-    .order('intake_date', { ascending: true }) // stable "random" until we add random()
-    .maybeSingle()
+    .in('status', ['available', 'reserved', 'fostered'])
+    .limit(20) // fetch up to 20 featured — pick one randomly server-side
 
   if (error) {
     console.error('getFeaturedAnimal error:', error.message)
     return null
   }
-  return data as FeaturedAnimal | null
+  if (!data || (data as FeaturedAnimal[]).length === 0) return null
+
+  // Server-side random selection — changes on every render (force-dynamic)
+  const list = data as FeaturedAnimal[]
+  return list[Math.floor(Math.random() * list.length)]
 }
 
 async function getAvailableCount(): Promise<number> {
@@ -173,6 +178,9 @@ export default async function WelcomePage() {
           {count > 0 ? count : '—'}
         </span>
       </div>
+
+      {/* Scroll hint — disappears on scroll */}
+      <ScrollHint />
     </div>
   )
 }
