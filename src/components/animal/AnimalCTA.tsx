@@ -66,7 +66,8 @@ export default function AnimalCTA({
         <button
           type="button"
           onClick={handleWhatsApp}
-          className="w-full bg-charcoal text-linen rounded-pill px-7 py-4 text-sm font-semibold tracking-[0.04em] hover:bg-[#1A1612] transition-colors flex items-center justify-center gap-2.5"
+          aria-label={`Message ${orgName} about ${animalName} on WhatsApp`}
+          className="w-full bg-[#2D2926] text-[#F7F2EB] rounded-full px-7 py-4 text-sm font-semibold tracking-[0.04em] hover:bg-[#1A1612] transition-colors flex items-center justify-center gap-2.5"
         >
           💬 {t('animal.whatsappCta', { org: orgName, name: animalName })}
         </button>
@@ -121,7 +122,8 @@ export default function AnimalCTA({
           <button
             type="button"
             onClick={handleWhatsApp}
-            className="shrink-0 bg-terracotta text-white rounded-pill px-5 py-2.5 text-sm font-semibold tracking-[0.04em] hover:bg-[#B05A3E] transition-colors shadow-[0_4px_16px_rgba(196,111,82,0.3)]"
+            aria-label={`Message ${orgName} about ${animalName} on WhatsApp`}
+            className="shrink-0 bg-[#C46F52] text-white rounded-full px-5 py-2.5 text-sm font-semibold tracking-[0.04em] hover:bg-[#B05A3E] transition-colors shadow-[0_4px_16px_rgba(196,111,82,0.3)]"
           >
             {t('animal.meetCta', { name: animalName })}
           </button>

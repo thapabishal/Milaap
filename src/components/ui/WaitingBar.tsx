@@ -12,8 +12,11 @@ export default function WaitingBar({ daysWaiting, maxDaysWaiting }: WaitingBarPr
     <div className="flex items-center gap-2 mb-3">
       <div className="flex-1 h-[2px] bg-linen-dark rounded-full overflow-hidden">
         <div
-          className="h-full bg-terracotta rounded-full transition-all duration-500"
-          style={{ width: `${pct}%` }}
+          className="h-full bg-terracotta rounded-full"
+          style={{
+            width: `${pct}%`,
+            animation: 'waitingBarGrow 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 300ms both',
+          }}
           role="progressbar"
           aria-valuenow={daysWaiting}
           aria-valuemin={0}

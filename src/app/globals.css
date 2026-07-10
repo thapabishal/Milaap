@@ -54,6 +54,12 @@
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
+/* ── Waiting bar load animation ─────────────────── */
+@keyframes waitingBarGrow {
+  from { width: 0% }
+  /* final width is set inline via style.width */
+}
+
 /* ── Base styles ─────────────────────────────────── */
 :root {
   --font-satoshi: '';

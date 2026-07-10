@@ -12,6 +12,7 @@ import AnimalCTA from '@/components/animal/AnimalCTA'
 import AdoptedBanner from '@/components/animal/AdoptedBanner'
 import AdoptedWaitingBar from '@/components/animal/AdoptedWaitingBar'
 import ProfileViewTracker from '@/components/animal/ProfileViewTracker'
+import ProfileContent from '@/components/animal/ProfileContent'
 import Badge from '@/components/ui/Badge'
 import WaitingBar from '@/components/ui/WaitingBar'
 
@@ -240,17 +241,19 @@ export default async function AnimalProfilePage({
 
       <article className="min-h-screen bg-linen">
 
-        {/* ── Photo gallery ─────────────────────────────── */}
+      {/* ── Photo gallery ─────────────────────────────── */}
         <AnimalPhotoGallery
           photos={animal.photos}
           animalName={animal.name}
+          orgName={org?.name}
+          species={animal.species}
         />
 
         {/* ── Content area ──────────────────────────────── */}
-        <div className="px-6 md:px-10 max-w-2xl mx-auto">
+        <ProfileContent>
 
           {/* Status + org row */}
-          <div className="flex items-center gap-2 mt-5">
+          <div data-fade className="flex items-center gap-2 mt-5">
             <Badge variant={badgeVariant}>{statusLabel}</Badge>
             <span className="text-stone/40 text-xs" aria-hidden="true">·</span>
             {org ? (
@@ -265,7 +268,7 @@ export default async function AnimalProfilePage({
           </div>
 
           {/* Waiting bar — adopted shows different bar + label */}
-          <div className="mt-4">
+          <div data-fade className="mt-4">
             {isAdopted ? (
               <AdoptedWaitingBar daysWaited={days} />
             ) : (
@@ -273,13 +276,16 @@ export default async function AnimalProfilePage({
             )}
           </div>
 
-          {/* Name */}
-          <h1 className="font-satoshi font-bold text-[38px] leading-tight tracking-[-0.02em] text-charcoal mt-4">
+          {/* Name — clamp at 2 lines to prevent overflow */}
+          <h1
+            data-fade
+            className="font-satoshi font-bold text-[38px] leading-tight tracking-[-0.02em] text-charcoal mt-4 line-clamp-2"
+          >
             {animal.name}
           </h1>
 
           {/* Species · Age · Gender */}
-          <p className="mt-1 text-xs text-stone tracking-[0.02em]">
+          <p data-fade className="mt-1 text-xs text-stone tracking-[0.02em]">
             {capitalise(animal.species)}
             {' · '}
             {ageStr}
@@ -287,14 +293,21 @@ export default async function AnimalProfilePage({
             {capitalise(animal.gender)}
           </p>
 
-          {/* One-liner */}
-          <p className="mt-4 text-sm text-stone font-light italic leading-relaxed">
-            "{animal.one_liner}"
-          </p>
+          {/* One-liner — max 3 lines on mobile with fade-out bottom edge */}
+          <div data-fade className="mt-4 relative">
+            <p className="text-sm text-stone font-light italic leading-relaxed line-clamp-3 md:line-clamp-none">
+              &ldquo;{animal.one_liner}&rdquo;
+            </p>
+            {/* Fade-out gradient on mobile when text is clamped */}
+            <div
+              className="md:hidden absolute inset-x-0 bottom-0 h-5 bg-gradient-to-t from-linen to-transparent pointer-events-none"
+              aria-hidden="true"
+            />
+          </div>
 
           {/* Adopted announcement banner — above story */}
           {isAdopted && (
-            <div className="mt-6">
+            <div data-fade className="mt-6">
               <AdoptedBanner
                 animalName={animal.name}
                 adoptedDate={animal.adopted_date}
@@ -306,52 +319,64 @@ export default async function AnimalProfilePage({
           )}
 
           {/* Story + personality */}
-          <AnimalStory
-            gender={animal.gender}
-            story_en={animal.story_en}
-            story_ne={animal.story_ne}
-            personality_en={animal.personality_en}
-            personality_ne={animal.personality_ne}
-          />
+          <div data-fade>
+            <AnimalStory
+              gender={animal.gender}
+              story_en={animal.story_en}
+              story_ne={animal.story_ne}
+              personality_en={animal.personality_en}
+              personality_ne={animal.personality_ne}
+            />
+          </div>
 
           {/* Traits */}
-          <AnimalTraits
-            animalName={animal.name}
-            good_with_kids={animal.good_with_kids}
-            good_with_dogs={animal.good_with_dogs}
-            good_with_cats={animal.good_with_cats}
-            apartment_ok={animal.apartment_ok}
-            is_vaccinated={animal.is_vaccinated}
-            is_neutered={animal.is_neutered}
-            energy_level={animal.energy_level}
-          />
+          <div data-fade>
+            <AnimalTraits
+              animalName={animal.name}
+              good_with_kids={animal.good_with_kids}
+              good_with_dogs={animal.good_with_dogs}
+              good_with_cats={animal.good_with_cats}
+              apartment_ok={animal.apartment_ok}
+              is_vaccinated={animal.is_vaccinated}
+              is_neutered={animal.is_neutered}
+              energy_level={animal.energy_level}
+            />
+          </div>
 
           {/* Perks */}
-          <AnimalPerks animalName={animal.name} />
+          <div data-fade>
+            <AnimalPerks animalName={animal.name} />
+          </div>
 
           {/* Extra photo grid */}
-          <AnimalPhotoGrid
-            photos={animal.photos}
-            animalName={animal.name}
-          />
+          <div data-fade>
+            <AnimalPhotoGrid
+              photos={animal.photos}
+              animalName={animal.name}
+              orgName={org?.name}
+              species={animal.species}
+            />
+          </div>
 
           {/* CTA section — hidden for adopted animals */}
           {org && !isAdopted && (
-            <AnimalCTA
-              animalId={animal.id}
-              animalName={animal.name}
-              animalSlug={animal.slug}
-              animalOneLiner={animal.one_liner}
-              daysWaiting={days}
-              orgName={org.name}
-              orgWhatsapp={org.whatsapp_number}
-              organizationId={animal.organization_id}
-            />
+            <div data-fade>
+              <AnimalCTA
+                animalId={animal.id}
+                animalName={animal.name}
+                animalSlug={animal.slug}
+                animalOneLiner={animal.one_liner}
+                daysWaiting={days}
+                orgName={org.name}
+                orgWhatsapp={org.whatsapp_number}
+                organizationId={animal.organization_id}
+              />
+            </div>
           )}
 
-          {/* Bottom padding — extra on mobile for sticky bar */}
-          <div className="h-28 md:h-16" />
-        </div>
+          {/* Bottom padding — 100px on mobile to clear sticky CTA bar */}
+          <div className="h-[100px] md:h-16" />
+        </ProfileContent>
       </article>
 
       {/* ── JSON-LD structured data ──────────────────────── */}

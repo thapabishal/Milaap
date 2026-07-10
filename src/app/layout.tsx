@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     // lang="en" is the server default; LangSync updates it on the client
     // when the user switches language or a saved preference is detected.
-    <html lang="en" className={`${satoshi.variable} h-full antialiased`}>
+    <html lang="en" className={`${satoshi.variable} h-full antialiased scroll-smooth`}>
       <body className="min-h-full flex flex-col bg-linen text-charcoal">
         <I18nProvider>
           <LangSync />

@@ -13,13 +13,15 @@ interface Photo {
 interface AnimalPhotoGridProps {
   photos: Photo[]
   animalName: string
+  orgName?: string
+  species?: string
 }
 
 function photoUrl(path: string): string {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/animal-photos/${path}`
 }
 
-export default function AnimalPhotoGrid({ photos, animalName }: AnimalPhotoGridProps) {
+export default function AnimalPhotoGrid({ photos, animalName, orgName, species }: AnimalPhotoGridProps) {
   const { t } = useTranslation()
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
@@ -64,9 +66,12 @@ export default function AnimalPhotoGrid({ photos, animalName }: AnimalPhotoGridP
             >
               <Image
                 src={photoUrl(photo.path)}
-                alt={photo.caption ?? `${animalName} photo ${i + 2}`}
+                alt={photo.caption ?? (orgName && species
+                  ? `${animalName} — ${species} available for adoption at ${orgName}`
+                  : `${animalName} photo ${i + 2}`)}
                 fill
                 className="object-cover"
+                loading="lazy"
                 sizes="(max-width: 768px) 50vw, 400px"
               />
             </button>
