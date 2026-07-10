@@ -7,6 +7,18 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Milaap Nepal',
   description: 'Connecting rescued animals with loving families in Nepal.',
+  openGraph: {
+    title:       'Milaap Nepal',
+    description: 'Two stories. One journey. Find your next companion — rescued animals waiting for a home in Nepal.',
+    images:      [{ url: '/api/share-image/default', width: 1200, height: 630 }],
+    siteName:    'Milaap Nepal',
+  },
+  twitter: {
+    card:        'summary_large_image',
+    title:       'Milaap Nepal',
+    description: 'Two stories. One journey.',
+    images:      ['/api/share-image/default'],
+  },
 }
 
 export default function RootLayout({
