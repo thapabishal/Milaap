@@ -1,5 +1,8 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import AdminLoginForm from '@/components/admin/AdminLoginForm'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Sign in | Milaap Admin',
@@ -36,7 +39,9 @@ export default function AdminLoginPage() {
 
         {/* Card */}
         <div className="bg-white rounded-[20px] shadow-[0_1px_3px_rgba(45,41,38,0.06)] p-8">
-          <AdminLoginForm />
+          <Suspense fallback={<div className="h-48" />}>
+            <AdminLoginForm />
+          </Suspense>
         </div>
 
         <p className="mt-6 text-center text-xs text-stone/60">
