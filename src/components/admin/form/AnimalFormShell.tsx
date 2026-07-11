@@ -1,25 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { type AnimalDraft, EMPTY_DRAFT, validateStep } from './types'
+import { type AnimalDraft, type PhotoEntry, EMPTY_DRAFT, validateStep } from './types'
 import AnimalFormStep1 from './AnimalFormStep1'
 import AnimalFormStep2 from './AnimalFormStep2'
 import AnimalFormStep3 from './AnimalFormStep3'
+import AnimalFormStep4 from './AnimalFormStep4'
+import AnimalFormStep5 from './AnimalFormStep5'
+import AnimalFormStep6 from './AnimalFormStep6'
 
 const STEPS = [
   { number: 1, label: 'Basics' },
   { number: 2, label: 'Story' },
   { number: 3, label: 'Traits' },
-  { number: 4, label: 'Photos' },
-  { number: 5, label: 'Medical' },
+  { number: 4, label: 'Medical' },
+  { number: 5, label: 'Photos' },
   { number: 6, label: 'Review' },
 ]
-
 const TOTAL_STEPS = STEPS.length
 
-// Generate a URL-safe slug from animal name + short uuid suffix
 function generateSlug(name: string): string {
   const base = name
     .toLowerCase()
@@ -32,15 +33,18 @@ function generateSlug(name: string): string {
 
 interface Props {
   initialData?: Partial<AnimalDraft>
-  animalId?: string          // present when editing
+  animalId?: string
   orgId: string
 }
 
 export default function AnimalFormShell({ initialData, animalId, orgId }: Props) {
   const [step, setStep] = useState(1)
   const [draft, setDraft] = useState<AnimalDraft>({ ...EMPTY_DRAFT, ...initialData })
+  const [photos, setPhotos] = useState<PhotoEntry[]>([])
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  // Stable temp ID used as storage folder prefix for photos before animal is saved
+  const tempAnimalId = useRef(animalId ?? crypto.randomUUID()).current
   const router = useRouter()
 
   function patch(p: Partial<AnimalDraft>) {
@@ -60,26 +64,18 @@ export default function AnimalFormShell({ initialData, animalId, orgId }: Props)
     setStep((s) => Math.max(s - 1, 1))
   }
 
-  async function handleSaveDraft() {
-    setSaving(true)
-    setError(null)
-    try {
-      await upsert(false)
-      router.push('/admin/animals')
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Save failed')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  async function upsert(publish: boolean) {
+  async function upsert(publish: boolean): Promise<string> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const supabase = createClient() as any
+
+    // Build photos jsonb — only uploaded ones
+    const photosJson = photos
+      .filter((p) => p.path)
+      .map((p, i) => ({ path: p.path!, is_hero: i === 0 }))
+
     const payload = {
       organization_id: orgId,
       name: draft.name.trim(),
-      slug: animalId ? undefined : generateSlug(draft.name),
       species: draft.species,
       breed: draft.breed.trim() || null,
       gender: draft.gender,
@@ -102,18 +98,56 @@ export default function AnimalFormShell({ initialData, animalId, orgId }: Props)
       is_vaccinated: draft.is_vaccinated,
       is_neutered: draft.is_neutered,
       is_microchipped: draft.is_microchipped,
+      medical_notes: draft.medical_notes.trim() || null,
+      photos: photosJson,
       is_published: publish,
     }
 
     if (animalId) {
-      // Remove slug from patch — slug never changes after creation
-      const { slug: _slug, ...patchPayload } = payload as typeof payload & { slug?: string }
-      void _slug
-      const { error } = await supabase.from('animals').update(patchPayload).eq('id', animalId)
+      const { error } = await supabase
+        .from('animals')
+        .update(payload)
+        .eq('id', animalId)
       if (error) throw new Error(error.message)
+      return animalId
     } else {
-      const { error } = await supabase.from('animals').insert([payload])
+      const { data, error } = await supabase
+        .from('animals')
+        .insert([{ ...payload, slug: generateSlug(draft.name) }])
+        .select('id')
+        .single()
       if (error) throw new Error(error.message)
+      return (data as { id: string }).id
+    }
+  }
+
+  async function handleSaveDraft() {
+    setSaving(true)
+    setError(null)
+    try {
+      await upsert(false)
+      // Store toast message in sessionStorage, read on the list page
+      sessionStorage.setItem(
+        'admin_toast',
+        `Saved as draft — ${draft.name} is not yet visible to the public`
+      )
+      router.push('/admin/animals')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Save failed')
+      setSaving(false)
+    }
+  }
+
+  async function handlePublish() {
+    setSaving(true)
+    setError(null)
+    try {
+      await upsert(true)
+      sessionStorage.setItem('admin_toast', `${draft.name} is now live on Milaap 🎉`)
+      router.push('/admin/animals')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Publish failed')
+      setSaving(false)
     }
   }
 
@@ -129,18 +163,17 @@ export default function AnimalFormShell({ initialData, animalId, orgId }: Props)
               key={s.number}
               type="button"
               onClick={() => {
-                // Only allow navigating to completed steps
                 if (s.number < step) { setStep(s.number); setError(null) }
               }}
               className={[
-                'flex flex-col items-center gap-1 group',
+                'flex flex-col items-center gap-1',
                 s.number < step ? 'cursor-pointer' : 'cursor-default',
               ].join(' ')}
               aria-label={`Step ${s.number}: ${s.label}`}
             >
               <div className={[
                 'w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-semibold transition-colors',
-                s.number < step  ? 'bg-terracotta text-white' :
+                s.number < step   ? 'bg-terracotta text-white' :
                 s.number === step ? 'bg-white border-2 border-terracotta text-terracotta' :
                 'bg-linen-dark text-stone',
               ].join(' ')}>
@@ -159,8 +192,6 @@ export default function AnimalFormShell({ initialData, animalId, orgId }: Props)
             </button>
           ))}
         </div>
-
-        {/* Thin progress line */}
         <div className="h-[2px] bg-linen-dark rounded-full overflow-hidden -mt-1">
           <div
             className="h-full bg-terracotta rounded-full transition-all duration-300"
@@ -169,57 +200,47 @@ export default function AnimalFormShell({ initialData, animalId, orgId }: Props)
         </div>
       </div>
 
-      {/* ── Step content ── */}
+      {/* ── Step card ── */}
       <div className="bg-white border border-linen-dark rounded-2xl p-6 shadow-[0_1px_3px_rgba(45,41,38,0.06)]">
         <h2 className="font-satoshi font-bold text-xl text-charcoal mb-1">
           {step === 1 && 'The basics'}
           {step === 2 && 'The story'}
           {step === 3 && 'Personality & traits'}
-          {step === 4 && 'Photos'}
-          {step === 5 && 'Medical details'}
-          {step === 6 && 'Review & save'}
+          {step === 4 && 'Medical details'}
+          {step === 5 && 'Photos'}
+          {step === 6 && 'Review & publish'}
         </h2>
         <p className="text-[12px] text-stone mb-6">
           {step === 1 && 'Start with the essential details about this animal.'}
           {step === 2 && 'This is what makes people fall in love. Take your time.'}
           {step === 3 && 'Help families understand if this animal is a good fit.'}
-          {step === 4 && 'Upload photos — the hero photo appears on the discovery feed.'}
-          {step === 5 && 'Internal medical status — not shown publicly except vaccination and neutered.'}
-          {step === 6 && 'Everything looks good? Save as draft or publish now.'}
+          {step === 4 && 'Internal medical status — vaccination and neutered shown publicly.'}
+          {step === 5 && 'Upload photos — the first photo is the hero shown on the discovery feed.'}
+          {step === 6 && 'Run the quality check, then publish or save as draft.'}
         </p>
 
         {step === 1 && <AnimalFormStep1 data={draft} onChange={patch} />}
         {step === 2 && <AnimalFormStep2 data={draft} onChange={patch} />}
         {step === 3 && <AnimalFormStep3 data={draft} onChange={patch} />}
-
-        {/* Steps 4, 5, 6 — placeholders for future builds */}
-        {step === 4 && (
-          <div className="py-10 text-center">
-            <p className="text-2xl mb-2">📷</p>
-            <p className="text-sm text-stone">Photo upload — coming in the next step.</p>
-          </div>
-        )}
+        {step === 4 && <AnimalFormStep4 data={draft} onChange={patch} />}
         {step === 5 && (
-          <div className="py-10 text-center">
-            <p className="text-2xl mb-2">🩺</p>
-            <p className="text-sm text-stone">Medical notes — coming in the next step.</p>
-          </div>
+          <AnimalFormStep5
+            orgId={orgId}
+            tempAnimalId={tempAnimalId}
+            photos={photos}
+            onPhotosChange={setPhotos}
+          />
         )}
         {step === 6 && (
-          <div className="space-y-4">
-            <div className="bg-linen border border-linen-dark rounded-xl p-4 text-sm text-charcoal space-y-1">
-              <p><span className="font-semibold">Name:</span> {draft.name || '—'}</p>
-              <p><span className="font-semibold">Species:</span> {draft.species} · {draft.gender}</p>
-              <p><span className="font-semibold">Intake date:</span> {draft.intake_date || '—'}</p>
-              <p><span className="font-semibold">Story length:</span> {draft.story_en.trim().split(/\s+/).filter(Boolean).length} words</p>
-            </div>
-            <p className="text-[11px] text-stone">
-              Saving as draft keeps the profile private. Publish will run an AI quality check first.
-            </p>
-          </div>
+          <AnimalFormStep6
+            draft={draft}
+            photos={photos}
+            onSaveDraft={handleSaveDraft}
+            onPublish={handlePublish}
+            saving={saving}
+          />
         )}
 
-        {/* Error */}
         {error && (
           <div className="mt-4 px-4 py-2.5 bg-terracotta/8 border border-terracotta/20 rounded-xl">
             <p className="text-[12px] text-terracotta">{error}</p>
@@ -227,31 +248,29 @@ export default function AnimalFormShell({ initialData, animalId, orgId }: Props)
         )}
       </div>
 
-      {/* ── Navigation ── */}
-      <div className="flex items-center justify-between mt-5">
-        <button
-          type="button"
-          onClick={handleBack}
-          disabled={step === 1}
-          className="bg-transparent text-stone border border-linen-dark rounded-full px-6 py-2.5 text-sm tracking-[0.04em] hover:border-charcoal/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          ← Back
-        </button>
+      {/* ── Navigation (hidden on step 6 — actions are inside the card) ── */}
+      {step < TOTAL_STEPS && (
+        <div className="flex items-center justify-between mt-5">
+          <button
+            type="button"
+            onClick={handleBack}
+            disabled={step === 1}
+            className="bg-transparent text-stone border border-linen-dark rounded-full px-6 py-2.5 text-sm tracking-[0.04em] hover:border-charcoal/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            ← Back
+          </button>
 
-        <div className="flex items-center gap-2">
-          {/* Save as draft (available from step 1 onward if name is filled) */}
-          {draft.name.trim() && step < 6 && (
-            <button
-              type="button"
-              onClick={handleSaveDraft}
-              disabled={saving}
-              className="text-[12px] text-stone hover:text-charcoal transition-colors"
-            >
-              {saving ? 'Saving…' : 'Save draft'}
-            </button>
-          )}
-
-          {step < TOTAL_STEPS ? (
+          <div className="flex items-center gap-3">
+            {draft.name.trim() && (
+              <button
+                type="button"
+                onClick={handleSaveDraft}
+                disabled={saving}
+                className="text-[12px] text-stone hover:text-charcoal transition-colors"
+              >
+                {saving ? 'Saving…' : 'Save draft'}
+              </button>
+            )}
             <button
               type="button"
               onClick={handleNext}
@@ -259,18 +278,22 @@ export default function AnimalFormShell({ initialData, animalId, orgId }: Props)
             >
               Continue →
             </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleSaveDraft}
-              disabled={saving}
-              className="bg-charcoal text-linen rounded-full px-7 py-2.5 text-sm font-semibold tracking-[0.04em] hover:bg-[#1A1612] transition-colors disabled:opacity-50"
-            >
-              {saving ? 'Saving…' : 'Save as draft'}
-            </button>
-          )}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Back button on step 6 */}
+      {step === TOTAL_STEPS && (
+        <div className="mt-5">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="bg-transparent text-stone border border-linen-dark rounded-full px-6 py-2.5 text-sm tracking-[0.04em] hover:border-charcoal/20 transition-colors"
+          >
+            ← Back
+          </button>
+        </div>
+      )}
     </div>
   )
 }

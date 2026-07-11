@@ -1,3 +1,12 @@
+export interface PhotoEntry {
+  id: string
+  previewUrl: string
+  path: string | null         // Supabase storage path — null while uploading
+  compressedSize: number | null
+  uploading: boolean
+  error: string | null
+}
+
 export interface AnimalDraft {
   // Step 1
   name: string
@@ -17,7 +26,7 @@ export interface AnimalDraft {
   story_ne: string
   personality_en: string
 
-  // Step 3
+  // Step 3 — compatibility
   good_with_kids: boolean | null
   good_with_dogs: boolean | null
   good_with_cats: boolean | null
@@ -25,10 +34,11 @@ export interface AnimalDraft {
   needs_garden: boolean | null
   energy_level: 'low' | 'medium' | 'high' | null
 
-  // Medical (step 3)
+  // Step 4 — medical
   is_vaccinated: boolean
   is_neutered: boolean
   is_microchipped: boolean
+  medical_notes: string
 }
 
 export const EMPTY_DRAFT: AnimalDraft = {
@@ -55,19 +65,20 @@ export const EMPTY_DRAFT: AnimalDraft = {
   is_vaccinated: false,
   is_neutered: false,
   is_microchipped: false,
+  medical_notes: '',
 }
 
 // Step validation — returns first missing required field label or null
 export function validateStep(step: number, draft: AnimalDraft): string | null {
   if (step === 1) {
-    if (!draft.name.trim())       return 'Name is required'
-    if (!draft.intake_date)       return 'Intake date is required'
+    if (!draft.name.trim())      return 'Name is required'
+    if (!draft.intake_date)      return 'Intake date is required'
   }
   if (step === 2) {
-    if (!draft.one_liner.trim())  return 'One-liner is required'
-    if (!draft.story_en.trim())   return 'Full story is required'
+    if (!draft.one_liner.trim()) return 'One-liner is required'
+    if (!draft.story_en.trim())  return 'Full story is required'
     const words = draft.story_en.trim().split(/\s+/).length
-    if (words < 80)               return `Story needs at least 80 words (currently ${words})`
+    if (words < 80)              return `Story needs at least 80 words (currently ${words})`
   }
   return null
 }
