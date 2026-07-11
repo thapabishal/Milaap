@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { trackEvent } from '@/lib/analytics'
 import { useToast } from '@/components/ui/useToast'
+import ShareAssetGenerator from './ShareAssetGenerator'
 
 interface ShareSheetProps {
   open: boolean
@@ -12,8 +13,11 @@ interface ShareSheetProps {
   animalSlug: string
   animalId: string
   organizationId: string
+  orgName?: string
+  orgInstagram?: string | null
   daysWaiting: number
   oneLiner: string
+  heroPhotoUrl?: string | null
 }
 
 export default function ShareSheet({
@@ -23,8 +27,11 @@ export default function ShareSheet({
   animalSlug,
   animalId,
   organizationId,
+  orgName = '',
+  orgInstagram = null,
   daysWaiting,
   oneLiner,
+  heroPhotoUrl = null,
 }: ShareSheetProps) {
   const { t, i18n } = useTranslation()
   const { toast, ToastPortal } = useToast()
@@ -119,22 +126,17 @@ export default function ShareSheet({
           {/* Options */}
           <div className="flex flex-col gap-0.5 px-4 py-3">
 
-            {/* Instagram Story — stub */}
-            <ShareOption
-              icon="📖"
-              label={t('animal.shareSheet_instagram_story')}
-              sublabel={t('animal.shareSheet_comingSoon')}
-              disabled
-              onClick={() => {}}
-            />
-
-            {/* Instagram Post — stub */}
-            <ShareOption
-              icon="🖼"
-              label={t('animal.shareSheet_instagram_post')}
-              sublabel={t('animal.shareSheet_comingSoon')}
-              disabled
-              onClick={() => {}}
+          {/* Instagram Story + Post — real canvas generation */}
+            <ShareAssetGenerator
+              animalName={animalName}
+              animalSlug={animalSlug}
+              animalId={animalId}
+              organizationId={organizationId}
+              orgName={orgName}
+              orgInstagram={orgInstagram}
+              daysWaiting={daysWaiting}
+              oneLiner={oneLiner}
+              heroPhotoUrl={heroPhotoUrl}
             />
 
             {/* WhatsApp */}
