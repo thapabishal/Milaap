@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback, useId } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { compressForUpload } from '@/lib/image-compress'
 import type { PhotoEntry } from './types'
@@ -9,7 +10,7 @@ interface Props {
   orgId: string
   tempAnimalId: string
   photos: PhotoEntry[]
-  onPhotosChange: (photos: PhotoEntry[]) => void
+  onPhotosChange: Dispatch<SetStateAction<PhotoEntry[]>>
 }
 
 const ACCEPTED = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
