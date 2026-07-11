@@ -7,7 +7,7 @@ import AnimalCardSkeleton from '@/components/animal/AnimalCardSkeleton'
 
 // ── Types ──────────────────────────────────────────────────
 
-interface SearchParams {
+interface SearchParams extends Record<string, string | undefined> {
   species?: string
   size?: string
   city?: string
