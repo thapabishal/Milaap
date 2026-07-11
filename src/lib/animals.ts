@@ -81,7 +81,7 @@ const ANIMAL_SELECT = `
   is_vaccinated, is_neutered, energy_level,
   status, intake_date, photos,
   organization_id, is_featured,
-  organizations ( name, slug, city, whatsapp_number )
+  organizations!inner ( name, slug, city, whatsapp_number, verification_status )
 `
 
 // ── injectFeatured ─────────────────────────────────────────
@@ -141,9 +141,10 @@ export async function getDiscoveryFeed(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const maxQuery = (supabase as any)
     .from('animals')
-    .select('intake_date')
+    .select('intake_date, organizations!inner(verification_status)')
     .eq('is_published', true)
     .in('status', ACTIVE_STATUSES)
+    .neq('organizations.verification_status', 'suspended')
     .order('intake_date', { ascending: true })
     .limit(1)
     .maybeSingle()
@@ -156,6 +157,7 @@ export async function getDiscoveryFeed(
     .eq('is_published', true)
     .eq('is_featured', true)
     .in('status', ACTIVE_STATUSES)
+    .neq('organizations.verification_status', 'suspended')
     .order('intake_date', { ascending: true })
     .limit(10)
 
@@ -166,6 +168,7 @@ export async function getDiscoveryFeed(
     .select(ANIMAL_SELECT, { count: 'exact' })
     .eq('is_published', true)
     .in('status', ACTIVE_STATUSES)
+    .neq('organizations.verification_status', 'suspended')
     .order('intake_date', { ascending: true })
     .range((page - 1) * limit, page * limit - 1)
 

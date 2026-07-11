@@ -20,6 +20,7 @@ interface NavItem {
   icon: string
   label: string
   adminOnly?: boolean
+  platformOnly?: boolean
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -29,6 +30,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/analytics',   icon: '📈', label: 'Analytics' },
   { href: '/admin/org',         icon: '🏢', label: 'Our Profile', adminOnly: true },
   { href: '/admin/team',        icon: '👥', label: 'Team',         adminOnly: true },
+  { href: '/admin/platform',    icon: '🌐', label: 'Platform',     platformOnly: true },
 ]
 
 export default async function AdminSidebar({
@@ -41,9 +43,13 @@ export default async function AdminSidebar({
   const headersList = await headers()
   const currentPath = headersList.get('x-pathname') ?? ''
 
-  const visibleItems = NAV_ITEMS.filter(
-    (item) => !item.adminOnly || isOrgAdmin
-  )
+  const isPlatformAdmin = userRole === 'platform_admin'
+
+  const visibleItems = NAV_ITEMS.filter((item) => {
+    if (item.platformOnly) return isPlatformAdmin
+    if (item.adminOnly)    return isOrgAdmin
+    return true
+  })
 
   return (
     <aside
