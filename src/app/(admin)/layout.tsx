@@ -1,4 +1,4 @@
-import { redirect, headers as nextHeaders } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminMobileNav from '@/components/admin/AdminMobileNav'
@@ -30,16 +30,11 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const headersList = await nextHeaders()
-  const pathname    = headersList.get('x-pathname') ?? ''
-
-  // Login page renders without the sidebar shell — just show the page
-  const isLoginPage = pathname === '/admin/login'
-  if (isLoginPage) {
-    return <>{children}</>
-  }
-
   const adminUser = await getAdminUser()
+
+  // Not authenticated — redirect to login.
+  // The login page itself is excluded via its own route group so this
+  // layout never wraps it; no pathname check needed.
   if (!adminUser) redirect('/admin/login')
 
   const isOrgAdmin =
