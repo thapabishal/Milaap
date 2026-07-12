@@ -31,6 +31,9 @@ export default function RootLayout({
     // when the user switches language or a saved preference is detected.
     <html lang="en" className={`${satoshi.variable} h-full antialiased scroll-smooth`}>
       <head>
+        {/* Preload Satoshi Regular + Bold for LCP/CLS improvement */}
+        <link rel="preload" href="/fonts/satoshi/Satoshi-Regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/satoshi/Satoshi-Bold.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#C46F52" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
