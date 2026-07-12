@@ -38,7 +38,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#C46F52" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        <link rel="apple-touch-icon" href="/logo/apple-touch-icon.png" />
+        <link rel="icon" type="image/svg+xml" href="/logo/favicon.svg" />
+        <link rel="icon" type="image/x-icon" sizes="32x32" href="/logo/favicon.ico.ico" />
       </head>
       <body className="min-h-full flex flex-col bg-linen text-charcoal">
         <I18nProvider>

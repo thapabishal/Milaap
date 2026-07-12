@@ -548,3 +548,133 @@ Milaap is built and maintained by All Care Nepal — a registered animal welfare
 - Never let an animal profile 404 after adoption — always show adopted status
 
 ---
+
+## §16 — Design tokens (use these in every component — never hardcode values)
+
+### Colors (Tailwind class names → hex)
+```
+bg-linen / text-linen         #F7F2EB   Page backgrounds, breathing room (60% of UI)
+bg-charcoal / text-charcoal   #2D2926   Primary text, dark surfaces, footer, admin sidebar (30%)
+bg-terracotta / text-terra*   #C46F52   CTAs, waiting bar fill, active states ONLY (10%)
+bg-dusty-rose                 #D7A79A   Secondary accent, waiting labels, quote borders
+bg-sage / text-sage           #8A9B82   Available status, success states
+bg-stone / text-stone         #8A8078   Secondary text, captions, metadata
+bg-linen-dark                 #E8DDD0   Borders, dividers, skeleton base
+bg-linen-mid                  #EDE8E0   Inner section backgrounds, flat cards
+bg-terra-dark                 #A85A3F   Terracotta hover state
+bg-rose-light                 #EDD5CE   Very light rose tint, trait backgrounds
+bg-charcoal-mid               #3D3530   Charcoal hover in dark contexts
+
+Status colors (semantic — use only for status):
+status-available: #8A9B82  status-reserved: #D7A79A
+status-fostered:  #C4A882  status-medical:  #A08A7A  status-adopted: #6A8A6A
+```
+
+**Terracotta rule:** ONLY on primary buttons, waiting bar fill, active nav states.
+Never as a background, never on decorative elements, never on body text.
+
+### Typography (Tailwind font-size keys)
+```
+text-display      56px 700 tracking-[-0.025em]   Page hero headlines
+text-display-sm   48px 700 tracking-[-0.02em]    Section heroes, mobile headlines
+text-animal-lg    42px 700 tracking-[-0.02em]    Animal name on profile
+text-animal-md    36px 700 tracking-[-0.015em]   Animal name on card
+text-headline     24px 600 tracking-[-0.01em]    Section headers
+text-body-lg      17px 400                        Lead paragraphs
+text-body         15px 400 leading-[1.75]         All body copy
+text-body-sm      13px 400                        Secondary descriptions
+text-label        11px 500 tracking-[0.1em] UPPERCASE   Section labels
+text-label-sm     10px 500 tracking-[0.12em] UPPERCASE  Small labels, badges
+text-caption      12px 400                        Timestamps, metadata
+```
+
+Font family: `font-satoshi` on everything. No other font family exists in this project.
+Body text on linen: use `text-charcoal/80` (not full charcoal) for long-form readability.
+Stone on linen for non-critical text only — contrast is borderline (3.1:1).
+
+### Spacing (8px grid — use Tailwind spacing scale)
+```
+gap-xs: 4px    gap-sm: 8px    gap-md: 16px   gap-lg: 24px
+gap-xl: 32px   gap-2xl: 48px  gap-3xl: 64px  gap-4xl: 96px
+```
+
+### Border radius
+```
+rounded-tag:    6px    ← badges, tags, small chips
+rounded-card:   16px   ← all cards
+rounded-card-lg: 24px  ← large feature cards
+rounded-pill:   9999px ← buttons, toggles, status pills
+```
+
+### Shadows
+```
+shadow-card:      0 1px 3px rgba(45,41,38,0.06), 0 1px 2px rgba(45,41,38,0.04)
+shadow-card-hover: 0 8px 24px rgba(45,41,38,0.10), 0 2px 6px rgba(45,41,38,0.06)
+shadow-terra:     0 4px 20px rgba(196,111,82,0.28)
+shadow-terra-sm:  0 2px 10px rgba(196,111,82,0.20)
+shadow-dark:      0 4px 20px rgba(45,41,38,0.3)
+shadow-sheet:     0 -4px 40px rgba(45,41,38,0.15)
+```
+
+### Animation names (defined in tailwind.config.ts)
+```
+animate-waiting-pulse   3s ease-in-out infinite   ← waiting bar pulse dot
+animate-status-pulse    2s ease-in-out infinite   ← available badge dot
+animate-shimmer         1.8s linear infinite      ← skeleton loading
+animate-fade-up         0.4s ease-out both        ← entrance animation
+animate-slide-up        0.28s spring              ← bottom sheets
+animate-bar-fill        0.8s cubic-bezier(...)    ← waiting bar fill on mount
+animate-float           3s ease-in-out infinite   ← empty state mascot
+```
+
+Always add `@media (prefers-reduced-motion: reduce)` handling — globals.css collapses all animations to 0.01ms. Never override this.
+
+### External libraries approved for UI
+```
+framer-motion          Orchestrated animations, spring physics, layout transitions
+clsx                   Conditional className composition
+@radix-ui/react-dialog Accessible modals and bottom sheets (focus trapping)
+@radix-ui/react-tooltip Accessible tooltips on icon-only buttons
+```
+
+No other UI libraries. Build everything else from scratch with Tailwind.
+
+### The WaitingBar — signature component rules
+- Appears on EVERY animal card and EVERY animal profile. No exceptions.
+- Fill width: `(daysWaiting / maxDaysWaiting) * 100%`, min 2%, max 100%
+- Animates from 0 to final width on mount (animate-bar-fill, 300ms delay)
+- A small pulse dot at the right edge of the fill (animate-waiting-pulse)
+- Adopted variant: sage color, no pulse, label reads "X days — now home"
+- role="progressbar" aria-valuenow={days} aria-valuemax={max} aria-label="[Name] has been waiting X days"
+
+### Component import paths
+```
+@/components/ui/Button
+@/components/ui/Badge
+@/components/ui/Card
+@/components/ui/WaitingBar       ← THE signature component
+@/components/ui/Skeleton
+@/components/ui/Toast
+@/components/ui/LanguageToggle
+@/components/ui/Logo
+@/components/ui/EmptyState
+@/components/animal/AnimalCard
+@/components/layout/PublicHeader
+@/components/layout/PublicFooter
+@/components/admin/AdminShell
+@/components/share/ShareSheet
+```
+
+### Accessibility non-negotiables (check every component)
+- All icon-only buttons: `aria-label` required
+- All images: descriptive `alt` text (not empty unless purely decorative)
+- All inputs: associated `<label>` (not just placeholder)
+- Modals: Radix Dialog handles focus trap automatically — use it
+- Focus ring: `:focus-visible` ring is set globally in globals.css — never override with `outline-none` alone, always pair with `focus-visible:ring-*`
+- Touch targets: minimum 44×44px on all interactive elements
+
+### UI_UX_GUIDE.md — how to use it
+UI_UX_GUIDE.md is NOT read at session start. It is a prompt library.
+For each component or page task, extract the relevant section from UI_UX_GUIDE.md
+and paste it into Claude Code after the session start ritual.
+Reading it in full every session wastes ~2,500 lines of context unnecessarily.

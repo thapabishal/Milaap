@@ -20,7 +20,7 @@ export default function PublicFooter() {
 
         {/* Top row: logo + tagline */}
         <div className="flex flex-col gap-3">
-          <MilaapLogo variant="full" className="[&_span]:text-linen/90" />
+          <MilaapLogo variant="full" theme="white" />
           <p className="text-sm italic text-linen/50 font-light tracking-[0.01em]">
             Two stories. One journey.
           </p>

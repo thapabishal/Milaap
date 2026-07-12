@@ -1,54 +1,50 @@
+import Image from 'next/image'
+
 interface MilaapLogoProps {
-  /** 'full' shows mark + wordmark, 'mark' shows only the SVG icon */
+  /** 'full' shows mark + wordmark, 'mark' shows mark only */
   variant?: 'full' | 'mark'
+  /** 'color' for linen/terracotta backgrounds, 'white' for dark backgrounds */
+  theme?: 'color' | 'white'
   className?: string
+  /** Size of the mark in px (default 32) */
+  size?: number
 }
 
 /**
  * Milaap logo.
- * SVG mark: two crossing paths — left in terracotta, right in charcoal.
- * The crossing/meeting point dot is terracotta.
- * Wordmark: "Milaap" in Satoshi Bold.
+ * Uses the pre-built SVG assets from /public/logo/.
+ * 'full'  → logo-full.svg (mark + "Milaap" wordmark)
+ * 'mark'  → logo-mark.svg (mark only)
+ * theme 'white' → white variants for charcoal/dark backgrounds
  */
 export default function MilaapLogo({
   variant = 'full',
+  theme = 'color',
   className = '',
+  size = 32,
 }: MilaapLogoProps) {
-  return (
-    <div className={['flex items-center gap-2', className].join(' ')}>
-      {/* SVG mark: two arcing paths crossing at a terracotta dot */}
-      <svg
-        width="32"
-        height="32"
-        viewBox="0 0 32 32"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        {/* Left path — terracotta — arcs from bottom-left to top-right */}
-        <path
-          d="M4 26 C8 18, 14 14, 28 6"
-          stroke="#C46F52"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
-        {/* Right path — charcoal — arcs from top-left to bottom-right */}
-        <path
-          d="M4 6 C10 14, 18 18, 28 26"
-          stroke="#2D2926"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
-        {/* Crossing/meeting point dot — terracotta */}
-        <circle cx="16" cy="16" r="3" fill="#C46F52" />
-      </svg>
+  if (variant === 'full') {
+    const src = theme === 'white' ? '/logo/logo-full-white.svg' : '/logo/logo-full.svg'
+    return (
+      <Image
+        src={src}
+        alt="Milaap Nepal"
+        width={120}
+        height={size}
+        className={className}
+        priority
+      />
+    )
+  }
 
-      {/* Wordmark */}
-      {variant === 'full' && (
-        <span className="font-satoshi font-bold text-xl text-charcoal tracking-[-0.01em] leading-none">
-          Milaap
-        </span>
-      )}
-    </div>
+  const src = theme === 'white' ? '/logo/logo-mark-white.svg' : '/logo/logo-mark.svg'
+  return (
+    <Image
+      src={src}
+      alt="Milaap"
+      width={size}
+      height={size}
+      className={className}
+    />
   )
 }
